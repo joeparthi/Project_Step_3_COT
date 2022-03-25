@@ -105,7 +105,7 @@ public class Driver {
 		
 		}
 		
-		// Function __________________________________________________
+		// Function Declarations__________________________________________________
 		@Override 
 		public void enterFunc_decl(LittleParser.Func_declContext ctx) { 
 		
