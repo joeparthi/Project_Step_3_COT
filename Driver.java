@@ -83,7 +83,6 @@ public class Driver {
 		@Override 
 		public void enterVar_decl(LittleParser.Var_declContext ctx) { 
 		
-		
 		}
 
 		@Override 
@@ -95,7 +94,7 @@ public class Driver {
 		// Function Parameter Declarations ______________________________
 		@Override 
 		public void enterParam_decl(LittleParser.Param_declContext ctx) { 
-		
+			this.current_table.addSymbol(ctx.id().IDENTIFIER().getText(), new SymbolAttributes(ctx.var_type().getText());
 		
 		}
 
@@ -107,8 +106,12 @@ public class Driver {
 		
 		// Function Declarations__________________________________________________
 		@Override 
-		public void enterFunc_decl(LittleParser.Func_declContext ctx) { 
-		
+		public void enterFunc_decl(LittleParser.Func_declContext ctx) {
+
+			this.current_table.addSymbol(ctx.id().IDENTIFIER().getText(), new SymbolAttributes("FUNCTION");
+			this.symbol_table_stack.push(new SymbolTable(ctx.id(.IDENTIFIER().getText())));
+			this.current_table = this.symbol_table_stack.peek();
+	
 		
 		}
 
