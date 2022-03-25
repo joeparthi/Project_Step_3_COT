@@ -49,6 +49,8 @@ public class Driver {
 			this.current_table = null;
 		}
 		
+		
+		// Program Declarations _________________________________________
 		@Override 
 		public void enterProgram(LittleParser.ProgramContext ctx) { 
 			
@@ -63,7 +65,7 @@ public class Driver {
 		
 		
 		
-		// String declaration
+		// String Declarations _____________________________________________
 		@Override 
 		public void enterString_decl(LittleParser.String_declContext ctx) { 
 			
@@ -71,7 +73,50 @@ public class Driver {
 			
 		}
 		
-		@Override public void exitString_decl(LittleParser.String_declContext ctx) { }
+		@Override 
+		public void exitString_decl(LittleParser.String_declContext ctx) { 
+		
+		
+		}
+		
+		// Variable Declarations ____________________________________
+		@Override 
+		public void enterVar_decl(LittleParser.Var_declContext ctx) { 
+		
+		
+		}
+
+		@Override 
+		public void exitVar_decl(LittleParser.Var_declContext ctx) { 
+		
+		
+		}
+		
+		// Function Parameter Declarations ______________________________
+		@Override 
+		public void enterParam_decl(LittleParser.Param_declContext ctx) { 
+		
+		
+		}
+
+		@Override 
+		public void exitParam_decl(LittleParser.Param_declContext ctx) { 
+		
+		
+		}
+		
+		// Function __________________________________________________
+		@Override 
+		public void enterFunc_decl(LittleParser.Func_declContext ctx) { 
+		
+		
+		}
+
+		@Override 
+		public void exitFunc_decl(LittleParser.Func_declContext ctx) { 
+		
+		
+		}
 		
 	}
 	
