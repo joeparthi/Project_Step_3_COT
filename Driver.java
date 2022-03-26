@@ -82,7 +82,7 @@ public class Driver {
 		// Variable Declarations ____________________________________
 		@Override 
 		public void enterVar_decl(LittleParser.Var_declContext ctx) { 
-		
+
 		}
 
 		@Override 
@@ -117,10 +117,46 @@ public class Driver {
 
 		@Override 
 		public void exitFunc_decl(LittleParser.Func_declContext ctx) { 
-		
+			symbol_table_stack.pop();
 		
 		}
-		
+	
+		@Override public void enterWhile_stmt(LittleParser.While_stmtContext ctx) { }
+		/**
+		 * {@inheritDoc}
+		 *
+		 * <p>The default implementation does nothing.</p>
+		 */
+		@Override public void exitWhile_stmt(LittleParser.While_stmtContext ctx) { }
+		/**
+		* {@inheritDoc}
+	 	*
+	 	* <p>The default implementation does nothing.</p>
+		*/
+		@Override public void enterIf_stmt(LittleParser.If_stmtContext ctx) { }
+		/**
+		* {@inheritDoc}
+	 	*
+	 	* <p>The default implementation does nothing.</p>
+	 	*/
+		@Override public void exitIf_stmt(LittleParser.If_stmtContext ctx) { }
+		/**
+	 	* {@inheritDoc}
+	 	*
+	 	* <p>The default implementation does nothing.</p>
+	 	*/
+		@Override public void enterElse_part(LittleParser.Else_partContext ctx) { }
+		/**
+	 	* {@inheritDoc}
+	 	*
+	 	* <p>The default implementation does nothing.</p>
+	 	*/
+		@Override public void exitElse_part(LittleParser.Else_partContext ctx) { }
+		/**
+	 	* {@inheritDoc}
+	 	*
+	 	* <p>The default implementation does nothing.</p>
+	 	*/
 	}
 	
 	class SymbolTable {
