@@ -42,7 +42,9 @@ public class Driver {
 	class SymbolExtractor extends LittleBaseListener {
 		
 		private Stack<SymbolTable> symbol_table_stack;
+		private Stack<SymbolTable> symbol_table_stack_seen;
 		private SymbolTable current_table;
+		private Int block_count = 0;
 		
 		public SymbolExtractor() {
 			this.symbol_table_stack = new Stack<SymbolTable>();
@@ -60,8 +62,9 @@ public class Driver {
 		}
 		
 		@Override 
-		public void exitProgram(LittleParser.ProgramContext ctx) { }
-		
+		public void exitProgram(LittleParser.ProgramContext ctx) { 
+		}
+			
 		
 		
 		
@@ -117,46 +120,37 @@ public class Driver {
 
 		@Override 
 		public void exitFunc_decl(LittleParser.Func_declContext ctx) { 
-			symbol_table_stack.pop();
+			this.symbol_table_stack_seen.pop(this.symbol_table_stack.pop());
 		
 		}
 	
-		@Override public void enterWhile_stmt(LittleParser.While_stmtContext ctx) { }
-		/**
-		 * {@inheritDoc}
-		 *
-		 * <p>The default implementation does nothing.</p>
-		 */
-		@Override public void exitWhile_stmt(LittleParser.While_stmtContext ctx) { }
-		/**
-		* {@inheritDoc}
-	 	*
-	 	* <p>The default implementation does nothing.</p>
-		*/
-		@Override public void enterIf_stmt(LittleParser.If_stmtContext ctx) { }
-		/**
-		* {@inheritDoc}
-	 	*
-	 	* <p>The default implementation does nothing.</p>
-	 	*/
-		@Override public void exitIf_stmt(LittleParser.If_stmtContext ctx) { }
-		/**
-	 	* {@inheritDoc}
-	 	*
-	 	* <p>The default implementation does nothing.</p>
-	 	*/
-		@Override public void enterElse_part(LittleParser.Else_partContext ctx) { }
-		/**
-	 	* {@inheritDoc}
-	 	*
-	 	* <p>The default implementation does nothing.</p>
-	 	*/
-		@Override public void exitElse_part(LittleParser.Else_partContext ctx) { }
-		/**
-	 	* {@inheritDoc}
-	 	*
-	 	* <p>The default implementation does nothing.</p>
-	 	*/
+		@Override public void enterWhile_stmt(LittleParser.While_stmtContext ctx) {
+				block_count += 1;
+				this.symbol_table_stack.push(new SymbolTable("BLOCK" + block_count));
+		 }
+
+		@Override public void exitWhile_stmt(LittleParser.While_stmtContext ctx) { 
+			this.symbol_table_stack_seen.pop(this.symbol_table_stack.pop());
+		}
+
+		@Override public void enterIf_stmt(LittleParser.If_stmtContext ctx) {
+				block_count += 1;
+				this.symbol_table_stack.push(new SymbolTable("BLOCK" + block_count));
+		 }
+
+		@Override public void exitIf_stmt(LittleParser.If_stmtContext ctx) { 
+			this.symbol_table_stack_seen.pop(this.symbol_table_stack.pop());
+		}
+
+		@Override public void enterElse_part(LittleParser.Else_partContext ctx) {
+				block_count += 1;
+				this.symbol_table_stack.push(new SymbolTable("BLOCK" + block_count));
+		 }
+
+		@Override public void exitElse_part(LittleParser.Else_partContext ctx) {
+			this.symbol_table_stack_seen.pop(this.symbol_table_stack.pop());
+		 }
+
 	}
 	
 	class SymbolTable {
@@ -239,3 +233,4 @@ public class Driver {
 		}
 	}
 }
+
