@@ -109,7 +109,7 @@ public class Driver {
 		public void enterFunc_decl(LittleParser.Func_declContext ctx) {
 
 			this.current_table.addSymbol(ctx.id().IDENTIFIER().getText(), new SymbolAttributes("FUNCTION");
-			this.symbol_table_stack.push(new SymbolTable(ctx.id(.IDENTIFIER().getText())));
+			this.symbol_table_stack.push(new SymbolTable(ctx.id().IDENTIFIER().getText()));
 			this.current_table = this.symbol_table_stack.peek();
 	
 		
