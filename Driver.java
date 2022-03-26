@@ -44,7 +44,7 @@ public class Driver {
 		private Stack<SymbolTable> symbol_table_stack;
 		private Stack<SymbolTable> symbol_table_stack_seen;
 		private SymbolTable current_table;
-		private Int block_count = 0;
+		private int block_count = 0;
 		
 		public SymbolExtractor() {
 			this.symbol_table_stack = new Stack<SymbolTable>();
@@ -62,7 +62,8 @@ public class Driver {
 		}
 		
 		@Override 
-		public void exitProgram(LittleParser.ProgramContext ctx) { 
+		public void exitProgram(LittleParser.ProgramContext ctx) {
+			
 		}
 			
 		
@@ -125,12 +126,15 @@ public class Driver {
 		}
 	
 		@Override public void enterWhile_stmt(LittleParser.While_stmtContext ctx) {
-				block_count += 1;
-				this.symbol_table_stack.push(new SymbolTable("BLOCK" + block_count));
+			block_count++;
+			this.symbol_table_stack.push(new SymbolTable("BLOCK " + block_count));
+			this.current_table = this.symbol_table_stack.peek();
 		 }
 
 		@Override public void exitWhile_stmt(LittleParser.While_stmtContext ctx) { 
-			this.symbol_table_stack_seen.pop(this.symbol_table_stack.pop());
+			
+			// Pop from ST stack and push onto print stack for printing
+			this.symbol_table_stack_seen.push(this.symbol_table_stack.pop());
 		}
 
 		@Override public void enterIf_stmt(LittleParser.If_stmtContext ctx) {
