@@ -35,7 +35,7 @@ public class Driver {
 		
 		//parser.program();
 		
-		System.out.println("\nAccepted\n");
+		//System.out.println("\nAccepted\n");
 		
 	}
 	
@@ -64,6 +64,38 @@ public class Driver {
 		@Override 
 		public void exitProgram(LittleParser.ProgramContext ctx) {
 			
+			// For loop to iterate through print stack
+			for (int stack_iterate = 0; stack_iterate < symbol_table_stack_seen.size(); stack_iterate++) {
+				
+				// Pop off stack to get current symbol table to work with
+				current = symbol_table_stack_seen.pop();
+				
+				//Print current scope
+				println("Symbol table " + current.getScope());
+				
+				// Iterate through arraylist to print symbols in current symbol table
+				for(array_iterate = 0; array_iterate < current.symbolNames.size(); array_iterate++) {
+					
+					String symbol = current.symbolNames.get(array_iterate);
+					
+					String value = current.symbolTable.get(symbol);
+					
+					// If the type is a string, print name, type and value 
+					// Else print name and type for other symbols
+					if(value.getType() == "STRING") {
+						println("name " + symbol + " type " + value.getType() + " value " + value.getValue());
+					}
+					
+					else {
+						
+						println("name " + symbol + " type " + value.getType());
+					
+					}
+					
+				}
+				
+			}
+			
 		}
 			
 		
@@ -86,7 +118,16 @@ public class Driver {
 		// Variable Declarations ____________________________________
 		@Override 
 		public void enterVar_decl(LittleParser.Var_declContext ctx) { 
-
+			String type = ctx.var_type().getText();
+			
+			String id_list_string = ctx.id_list().getText();
+			String[] id_list = id_list_string.split(",");
+			
+			for(int id_iterate = 0; id_iterate < id_list.length; id_iterate++) {
+				
+				this.current_table.addSymbol(id_list[id_iterate], new SymbolAttributes(type);
+				
+			}
 		}
 
 		@Override 
@@ -98,7 +139,19 @@ public class Driver {
 		// Function Parameter Declarations ______________________________
 		@Override 
 		public void enterParam_decl(LittleParser.Param_declContext ctx) { 
-			this.current_table.addSymbol(ctx.id().IDENTIFIER().getText(), new SymbolAttributes(ctx.var_type().getText());
+			//this.current_table.addSymbol(ctx.id().IDENTIFIER().getText(), new SymbolAttributes(ctx.var_type().getText());
+			
+			String decl_list_str = ctx.param_decl_list().getText();
+			String[] decl_list_with_space = decl_list_str.split(",");
+			String[] decl_list = decl_list_with_space.split(" ");
+			
+			for(int i = 0; i < decl_list.length - 2; i = i + 2) {
+				
+				this.current_table.addSymbol(decl_list[i + 1], new SymbolAttributes(decl_list[i]);
+			}
+			
+			//FUNCTION VOID main(INT a, INT b, FLOAT c)
+			//decl_list = [INT a, INT b, FLOAT c];
 		
 		}
 
@@ -111,7 +164,8 @@ public class Driver {
 		// Function Declarations__________________________________________________
 		@Override 
 		public void enterFunc_decl(LittleParser.Func_declContext ctx) {
-
+			
+			// this.current_table.addSymbol(ctx.id().IDENTIFIER().getText(), new SymbolAttributes("FUNCTION");
 			this.current_table.addSymbol(ctx.id().IDENTIFIER().getText(), new SymbolAttributes("FUNCTION");
 			this.symbol_table_stack.push(new SymbolTable(ctx.id().IDENTIFIER().getText()));
 			this.current_table = this.symbol_table_stack.peek();
@@ -138,8 +192,9 @@ public class Driver {
 		}
 
 		@Override public void enterIf_stmt(LittleParser.If_stmtContext ctx) {
-				block_count += 1;
-				this.symbol_table_stack.push(new SymbolTable("BLOCK" + block_count));
+			block_count++;
+			this.symbol_table_stack.push(new SymbolTable("BLOCK" + block_count));
+			this.current_table = this.symbol_table_stack.peek();
 		 }
 
 		@Override public void exitIf_stmt(LittleParser.If_stmtContext ctx) { 
@@ -147,14 +202,15 @@ public class Driver {
 		}
 
 		@Override public void enterElse_part(LittleParser.Else_partContext ctx) {
-				block_count += 1;
+				block_count++;
 				this.symbol_table_stack.push(new SymbolTable("BLOCK" + block_count));
+				this.current_table = this.symbol_table_stack.peek();
 		 }
 
 		@Override public void exitElse_part(LittleParser.Else_partContext ctx) {
 			this.symbol_table_stack_seen.pop(this.symbol_table_stack.pop());
 		 }
-
+		
 	}
 	
 	class SymbolTable {
@@ -186,6 +242,7 @@ public class Driver {
 			
 			this.symbolTable.put(name, attr);
 			this.symbolNames.add(name);
+			//this.symbolTable.get(name).getValue().getType()
 		}
 		
 	}
@@ -209,10 +266,6 @@ public class Driver {
 		}
 	}
 	
-	
-	
-	
-	
 	public static class VerboseListener extends BaseErrorListener {
 		@Override
 		public void syntaxError(Recognizer<?, ?> recognizer,
@@ -226,7 +279,7 @@ public class Driver {
 			Collections.reverse(stack);
 			
 			if(stack.size() > 0) {
-				System.out.println("\nNot accepted\n");
+				// System.out.println("\nNot accepted\n");
 				System.exit(1);
 			}
 			/*
@@ -237,4 +290,3 @@ public class Driver {
 		}
 	}
 }
-
