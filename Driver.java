@@ -1,4 +1,3 @@
-
 import java.util.Collections;
 import java.util.List;
 import java.util.HashMap;
@@ -27,7 +26,13 @@ public class Driver {
 		
 		ParseTree tree = parser.program();
 		
-		//System.out.println(tree.toStringTree(parser));
+		ParseTreeWalker walker = new ParseTreeWalker();
+		
+		walker.walk(new SymbolExtractor(), tree);
+		
+		System.out.println();
+		
+		//System.out.System.out.println(tree.toStringTree(parser));
 		
 		//parser.removeErrorListeners();
 		
@@ -35,19 +40,21 @@ public class Driver {
 		
 		//parser.program();
 		
-		//System.out.println("\nAccepted\n");
+		//System.out.System.out.println("\nAccepted\n");
 		
 	}
 	
-	class SymbolExtractor extends LittleBaseListener {
+	static class SymbolExtractor extends LittleBaseListener {
 		
 		private Stack<SymbolTable> symbol_table_stack;
 		private Stack<SymbolTable> symbol_table_stack_seen;
 		private SymbolTable current_table;
-		private int block_count = 0;
+		private int block_count;
 		
 		public SymbolExtractor() {
 			this.symbol_table_stack = new Stack<SymbolTable>();
+			this.symbol_table_stack_seen = new Stack<SymbolTable>();
+			this.block_count = 0;
 			this.current_table = null;
 		}
 		
@@ -63,32 +70,66 @@ public class Driver {
 		
 		@Override 
 		public void exitProgram(LittleParser.ProgramContext ctx) {
+		
+			//System.out.println("\n\n\n" + this.symbol_table_stack_seen.size() + "\n\n\n");
+			
+			//this.symbol_table_stack_seen.push(this.symbol_table_stack.pop());
+			
+			int size_stack = symbol_table_stack.size();
+			
+			for(int pop = 0; pop < size_stack; pop++){
+			
+				this.symbol_table_stack_seen.push(this.symbol_table_stack.pop());
+				
+			}
+			
+			/*
+			
+				|GLOBAL|main| 2
+				
+				current = GLOBAL 
+				
+				prints all of array list for GLOBAL
+				
+				stack_iterate = 1
+				
+				current = main
+				
+				
+			
+			*/
 			
 			// For loop to iterate through print stack
-			for (int stack_iterate = 0; stack_iterate < symbol_table_stack_seen.size(); stack_iterate++) {
+			
+			int size = symbol_table_stack_seen.size();
+			
+			for (int stack_iterate = 0; stack_iterate < size; stack_iterate++) {
+				
+				// System.out.println("\n\nSTACK SIZE: " + symbol_table_stack_seen.size() + "\n\n");
+				// System.out.println("\n\nSTACK ITERATE VALUE: " + stack_iterate + "\n\n");
 				
 				// Pop off stack to get current symbol table to work with
-				current = symbol_table_stack_seen.pop();
+				SymbolTable current = symbol_table_stack_seen.pop();
 				
 				//Print current scope
-				println("Symbol table " + current.getScope());
+				System.out.println("\nSymbol table " + current.getScope());
 				
 				// Iterate through arraylist to print symbols in current symbol table
-				for(array_iterate = 0; array_iterate < current.symbolNames.size(); array_iterate++) {
+				for(int array_iterate = 0; array_iterate < current.symbolNames.size(); array_iterate++) {
 					
 					String symbol = current.symbolNames.get(array_iterate);
 					
-					String value = current.symbolTable.get(symbol);
+					SymbolAttributes value = current.symbolTable.get(symbol);
 					
 					// If the type is a string, print name, type and value 
 					// Else print name and type for other symbols
 					if(value.getType() == "STRING") {
-						println("name " + symbol + " type " + value.getType() + " value " + value.getValue());
+						System.out.println("name " + symbol + " type " + value.getType() + " value " + value.getValue());
 					}
 					
 					else {
 						
-						println("name " + symbol + " type " + value.getType());
+						System.out.println("name " + symbol + " type " + value.getType());
 					
 					}
 					
@@ -125,7 +166,7 @@ public class Driver {
 			
 			for(int id_iterate = 0; id_iterate < id_list.length; id_iterate++) {
 				
-				this.current_table.addSymbol(id_list[id_iterate], new SymbolAttributes(type);
+				this.current_table.addSymbol(id_list[id_iterate], new SymbolAttributes(type, ""));
 				
 			}
 		}
@@ -136,23 +177,39 @@ public class Driver {
 		
 		}
 		
+		// Function Parameter List Declaration __________________________
+		
+		@Override public void enterParam_decl_list(LittleParser.Param_decl_listContext ctx) { 
+		/*
+			String decl_list_str = ctx.getText();
+			
+			if(decl_list_str != ""){
+			
+				System.out.print("\n\nBEFORE: " + decl_list_str + "\n\n");
+				String[] decl_list = decl_list_str.split(",");
+				System.out.print("\n\nAFTER: " + decl_list + "\n\n");
+			
+				for(int j = 0; j < decl_list.length; j++) {
+				
+					String[] temp = decl_list[j].split(" ");
+					this.current_table.addSymbol(temp[1], new SymbolAttributes(temp[0], ""));
+				
+				}
+			
+			}
+		*/
+		}
+	
+		@Override public void exitParam_decl_list(LittleParser.Param_decl_listContext ctx) { }
+		
+
 		// Function Parameter Declarations ______________________________
 		@Override 
 		public void enterParam_decl(LittleParser.Param_declContext ctx) { 
-			//this.current_table.addSymbol(ctx.id().IDENTIFIER().getText(), new SymbolAttributes(ctx.var_type().getText());
 			
-			String decl_list_str = ctx.param_decl_list().getText();
-			String[] decl_list_with_space = decl_list_str.split(",");
-			String[] decl_list = decl_list_with_space.split(" ");
-			
-			for(int i = 0; i < decl_list.length - 2; i = i + 2) {
-				
-				this.current_table.addSymbol(decl_list[i + 1], new SymbolAttributes(decl_list[i]);
-			}
-			
-			//FUNCTION VOID main(INT a, INT b, FLOAT c)
-			//decl_list = [INT a, INT b, FLOAT c];
-		
+			String type = ctx.var_type().getText();
+			String name = ctx.id().IDENTIFIER().getText();
+			this.current_table.addSymbol(name, new SymbolAttributes(type, ""));
 		}
 
 		@Override 
@@ -160,13 +217,14 @@ public class Driver {
 		
 		
 		}
+
 		
 		// Function Declarations__________________________________________________
 		@Override 
 		public void enterFunc_decl(LittleParser.Func_declContext ctx) {
 			
 			// this.current_table.addSymbol(ctx.id().IDENTIFIER().getText(), new SymbolAttributes("FUNCTION");
-			this.current_table.addSymbol(ctx.id().IDENTIFIER().getText(), new SymbolAttributes("FUNCTION");
+			
 			this.symbol_table_stack.push(new SymbolTable(ctx.id().IDENTIFIER().getText()));
 			this.current_table = this.symbol_table_stack.peek();
 	
@@ -175,7 +233,7 @@ public class Driver {
 
 		@Override 
 		public void exitFunc_decl(LittleParser.Func_declContext ctx) { 
-			this.symbol_table_stack_seen.pop(this.symbol_table_stack.pop());
+			
 		
 		}
 	
@@ -188,32 +246,32 @@ public class Driver {
 		@Override public void exitWhile_stmt(LittleParser.While_stmtContext ctx) { 
 			
 			// Pop from ST stack and push onto print stack for printing
-			this.symbol_table_stack_seen.push(this.symbol_table_stack.pop());
+			
 		}
 
 		@Override public void enterIf_stmt(LittleParser.If_stmtContext ctx) {
 			block_count++;
-			this.symbol_table_stack.push(new SymbolTable("BLOCK" + block_count));
+			this.symbol_table_stack.push(new SymbolTable("BLOCK " + block_count));
 			this.current_table = this.symbol_table_stack.peek();
 		 }
 
 		@Override public void exitIf_stmt(LittleParser.If_stmtContext ctx) { 
-			this.symbol_table_stack_seen.pop(this.symbol_table_stack.pop());
+			
 		}
 
 		@Override public void enterElse_part(LittleParser.Else_partContext ctx) {
-				block_count++;
-				this.symbol_table_stack.push(new SymbolTable("BLOCK" + block_count));
-				this.current_table = this.symbol_table_stack.peek();
+			block_count++;
+			this.symbol_table_stack.push(new SymbolTable("BLOCK " + block_count));
+			this.current_table = this.symbol_table_stack.peek();
 		 }
 
 		@Override public void exitElse_part(LittleParser.Else_partContext ctx) {
-			this.symbol_table_stack_seen.pop(this.symbol_table_stack.pop());
+			
 		 }
 		
 	}
 	
-	class SymbolTable {
+	static class SymbolTable {
 		
 		private String scope;
 		
@@ -248,7 +306,7 @@ public class Driver {
 	}
 	
 	
-	class SymbolAttributes {
+	static class SymbolAttributes {
 		String type;
 		String value;
 		
@@ -279,12 +337,12 @@ public class Driver {
 			Collections.reverse(stack);
 			
 			if(stack.size() > 0) {
-				// System.out.println("\nNot accepted\n");
+				// System.out.System.out.println("\nNot accepted\n");
 				System.exit(1);
 			}
 			/*
-			System.err.println("rule stack: "+stack);
-			System.err.println("line "+line+":"+charPositionInLine+" at "+
+			System.err.System.out.println("rule stack: "+stack);
+			System.err.System.out.println("line "+line+":"+charPositionInLine+" at "+
 			offendingSymbol+": "+msg);
 			*/
 		}
